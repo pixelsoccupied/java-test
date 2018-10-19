@@ -36,14 +36,14 @@ Pre-reqs
 Instructions
 ------------
 
-1. Fork this repo using the github website.
+1. Upload this repo to your the github account.
 1. Clone your new forked repo from github/gitlab .
 1. At the project root directory, run:
     `$ mvn package`
 1. At this point the maven build should run successfully and every test should be green.
 1. Perform the refactoring you deem necessary, following what you know to be the best practices. (feel free to innovate!).
 1. Please make sure your code compiles and that all tests are green when you are done.
-1. At the end of your work you should push the code to your forked repo.**DO NOT** do a pull request into the original repository.
+1. At the end of your work you should push the code to your repo. **DO NOT** do a pull request into the original repository.
 1. The final step is to send an email to your contact at the company informing him/her that you finished the test including the **public** Git Repo URL where the code changes can be found.
 
 Business Requirements
@@ -65,6 +65,5 @@ Good luck!
 
 [1]: http://maven.apache.org/
 [2]: https://github.com
-[3]: https://bitbucket.org/
 [4]: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 [5]: https://git-scm.com/downloads/guis
