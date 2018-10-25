@@ -68,4 +68,9 @@ public class UserDao {
         }
         return null;
     }
+
+    //for debug
+    public void init_method(){
+        System.out.println("Init bean");
+    }
 }

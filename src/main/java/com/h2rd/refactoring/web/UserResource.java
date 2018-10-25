@@ -81,7 +81,7 @@ public class UserResource{
     public Response getUsers() {
     	
         ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {
-    		"classpath:/application-config.xml"	
+    		"classpath:/application-config.xml"
     	});
     	userDao = context.getBean(UserDao.class);
     	List<User> users = userDao.getUsers();
