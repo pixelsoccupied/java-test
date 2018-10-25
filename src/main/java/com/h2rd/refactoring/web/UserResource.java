@@ -18,7 +18,7 @@ import java.util.List;
 @Repository
 public class UserResource{
 
-    public UserDao userDao;
+    private UserDao userDao;
 
     @GET
     @Path("add/")

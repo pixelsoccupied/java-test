@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class UserDao {
 
-    public ArrayList<User> users;
+    private ArrayList<User> users;
 
-    public static UserDao userDao;
+    private static UserDao userDao;
 
     public static UserDao getUserDao() {
         if (userDao == null) {
@@ -34,7 +34,7 @@ public class UserDao {
     public void deleteUser(User userToDelete) {
         try {
             for (User user : users) {
-                if (user.getName() == userToDelete.getName()) {
+                if (user.getName().equals(userToDelete.getName())) {
                     users.remove(user);
                 }
             }
@@ -46,7 +46,7 @@ public class UserDao {
     public void updateUser(User userToUpdate) {
         try {
             for (User user : users) {
-                if (user.getName() == userToUpdate.getName()) {
+                if (user.getName().equals(userToUpdate.getName())) {
                     user.setEmail(userToUpdate.getEmail());
                     user.setRoles(userToUpdate.getRoles());
                 }
@@ -59,7 +59,7 @@ public class UserDao {
     public User findUser(String name) {
         try {
             for (User user : users) {
-                if (user.getName() == name) {
+                if (user.getName().equals(name)) {
                     return user;
                 }
             }
