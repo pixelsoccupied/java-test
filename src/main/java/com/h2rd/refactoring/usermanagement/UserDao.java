@@ -1,28 +1,30 @@
 package com.h2rd.refactoring.usermanagement;
 
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserDao {
 
-    private ArrayList<User> users;
-
+    //Thread safe and O(1) time
+    private static ConcurrentHashMap <String, User> users;
     private static UserDao userDao;
 
     public static UserDao getUserDao() {
         if (userDao == null) {
             userDao = new UserDao();
+
         }
         return userDao;
     }
 
+
     public void saveUser(User user) {
         if (users == null) {
-            users = new ArrayList<User>();
+            users = new ConcurrentHashMap<String, User>();
         }
-        users.add(user);
+        users.put(user.getEmail(), user);
     }
 
-    public ArrayList<User> getUsers() {
+    public ConcurrentHashMap<String, User> getUsers() {
         try {
             return users;
         } catch (Throwable e) {
@@ -31,40 +33,29 @@ public class UserDao {
         }
     }
 
-    public void deleteUser(User userToDelete) {
-        try {
-            for (User user : users) {
-                if (user.getName().equals(userToDelete.getName())) {
-                    users.remove(user);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public int deleteUser(String email) {
+        if (users.containsKey(email)) {
+            users.remove(email);
+            return 0;
         }
+        else
+            return 1;
     }
 
-    public void updateUser(User userToUpdate) {
-        try {
-            for (User user : users) {
-                if (user.getName().equals(userToUpdate.getName())) {
-                    user.setEmail(userToUpdate.getEmail());
-                    user.setRoles(userToUpdate.getRoles());
-                }
-            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+    public int updateUser(User userToUpdate) {
+        // no change in email
+        if (users.get(userToUpdate.getEmail()).getEmail().equals(userToUpdate.getEmail())) {
+            users.get(userToUpdate.getEmail()).setName(userToUpdate.getName());
+            users.get(userToUpdate.getEmail()).setRoles(userToUpdate.getRoles());
+            return 0;
         }
+        else
+            return 1;
     }
 
-    public User findUser(String name) {
-        try {
-            for (User user : users) {
-                if (user.getName().equals(name)) {
-                    return user;
-                }
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+    public User findUser(String email) {
+        if (users.containsKey(email)){
+            return users.get(email);
         }
         return null;
     }

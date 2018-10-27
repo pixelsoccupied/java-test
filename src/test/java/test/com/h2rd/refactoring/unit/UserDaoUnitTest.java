@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class UserDaoUnitTest {
 
-    UserDao userDao;
+    private UserDao userDao;
 
     @Test
     public void saveUserTest() {
@@ -32,8 +32,9 @@ public class UserDaoUnitTest {
         user.setRoles(Arrays.asList("admin", "master"));
 
         try {
-            userDao.deleteUser(user);
+            userDao.deleteUser(user.getEmail());
         } catch (NullPointerException e) {
+            //TODO
         }
     }
 }

@@ -11,6 +11,7 @@
 	<name>Java Refactoring Test</name>
 	<description>Java Refactoring Test</description>
 
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -30,7 +31,7 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.8</version>
+            <version>1.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -42,6 +43,15 @@
             <artifactId>spring-core</artifactId>
             <version>3.1.2.RELEASE</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.owlike</groupId>
+            <artifactId>genson</artifactId>
+            <version>0.99</version>
+        </dependency>
+
     </dependencies>
+
 
 </project>
