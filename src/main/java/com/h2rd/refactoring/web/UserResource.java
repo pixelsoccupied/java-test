@@ -2,19 +2,17 @@ package com.h2rd.refactoring.web;
 
 import com.h2rd.refactoring.usermanagement.User;
 import com.h2rd.refactoring.usermanagement.UserDao;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
-
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 
@@ -88,7 +86,7 @@ public class UserResource{
 
         //check if the update was a success
         if (userDao.updateUser(user) == 0){
-            return Response.ok().entity(user).entity("Update complete").build();
+            return Response.ok().entity(user).build();
         }
         else
         {
@@ -119,14 +117,14 @@ public class UserResource{
     @Path("find/")
     public Response getUsers() {
     	userDao = context.getBean(UserDao.class);
-    	ConcurrentHashMap<String, User> users = userDao.getUsers();
+    	HashMap<String, User> users = userDao.getUsers();
     	if (users == null) {
-    		users = new ConcurrentHashMap<String, User>();
+    		users = new HashMap<String, User>();
         }
-        GenericEntity<ConcurrentHashMap<String, User>> usersEntity =
-                    new GenericEntity<ConcurrentHashMap<String, User>>(users) {};
+        GenericEntity<HashMap<String, User>> usersEntity =
+                    new GenericEntity<HashMap<String, User>>(users) {};
     	if (usersEntity.getEntity().isEmpty()){
-    	    return Response.ok().entity(usersEntity).entity("List is empty").build();
+    	    return Response.status(404).entity("List is empty").build();
     	}
 
     	return Response.ok().entity(usersEntity).build();

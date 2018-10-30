@@ -1,15 +1,13 @@
 package com.h2rd.refactoring.usermanagement;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public class UserDao {
 
-    //Thread safe and O(1) time
-    private static ConcurrentHashMap <String, User> users;
+    //O(1) add/delete/search
+    private static HashMap<String, User> users;
 
     private static UserDao userDao;
-
-    private static final Object mutex = new Object();
 
     private UserDao() {
 
@@ -24,9 +22,9 @@ public class UserDao {
     }
 
 
-    public int saveUser(User user) {
+    public synchronized int saveUser(User user) {
         if (users == null) {
-            users = new ConcurrentHashMap<String, User>();
+            users = new HashMap<String, User>();
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()){
             return 1;
@@ -45,7 +43,7 @@ public class UserDao {
         return 4;
     }
 
-    public ConcurrentHashMap<String, User> getUsers() {
+    public HashMap<String, User> getUsers() {
         try {
             return users;
         } catch (Throwable e) {
@@ -62,7 +60,7 @@ public class UserDao {
             return null;
     }
 
-    public int updateUser(User userToUpdate) {
+    public synchronized int updateUser(User userToUpdate) {
         //check if email exists
         if (!users.containsKey(userToUpdate.getEmail())){
             return -1;
@@ -84,10 +82,5 @@ public class UserDao {
             return users.get(email);
         }
         return null;
-    }
-
-    //for debug
-    public void init_method(){
-        System.out.println("Init bean");
     }
 }
