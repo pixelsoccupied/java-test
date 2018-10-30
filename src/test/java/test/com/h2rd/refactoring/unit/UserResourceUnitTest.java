@@ -7,11 +7,13 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class UserResourceUnitTest {
 
-    UserResource userResource;
-    UserDao userDao;
+    private UserResource userResource;
+    private UserDao userDao;
 
     @Test
     public void getUsersTest() {
@@ -22,7 +24,13 @@ public class UserResourceUnitTest {
         User user = new User();
         user.setName("fake user");
         user.setEmail("fake@user.com");
+        ArrayList<String> roles = new ArrayList<String>();
+        roles.add("Developer");
+        user.setRoles(roles);
+        System.out.println("Here");
         userDao.saveUser(user);
+
+        //Missing role should fail
 
         Response response = userResource.getUsers();
         Assert.assertEquals(200, response.getStatus());

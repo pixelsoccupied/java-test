@@ -7,18 +7,26 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+
 
 @Path("/users")
 @Repository
 public class UserResource{
 
     private UserDao userDao;
+    private ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {
+            "classpath:/application-config.xml"
+    });
+
 
     @GET
     @Path("add/")
@@ -26,21 +34,35 @@ public class UserResource{
                             @QueryParam("email") String email,
                             @QueryParam("role") List<String> roles) {
 
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setRoles(roles);
+         User user = new User();
+         user.setName(name);
+         user.setEmail(email);
+         user.setRoles(roles);
 
-        //System.out.println(userDao.getI());
+         //System.out.println(userDao.getI());
 
         if (userDao == null) {
             userDao = UserDao.getUserDao();
         }
+        int res = userDao.saveUser(user);
 
-        userDao.saveUser(user);
 
-        System.out.println("User total #" + userDao.getUsers().size());
-        return Response.ok().entity(user).build();
+        if (res == 0){
+            return Response.ok().entity(user).build();
+        }
+        if (res == 1) {
+            return Response.status(404).entity("Missing roles").build();
+        }
+        if (res == 2) {
+            return Response.status(404).entity("Missing email").build();
+        }
+        if (res == 3){
+            return Response.status(404).entity("Missing name").build();
+        }
+        else
+        {
+            return Response.status(404).entity(user).entity("This email already exists!").build();
+        }
     }
 
     @GET
@@ -48,6 +70,12 @@ public class UserResource{
     public Response updateUser(@QueryParam("name") String name,
                                @QueryParam("email") String email,
                                @QueryParam("role") List<String> roles) {
+        if (email == null || email.length() == 0 || !Pattern.matches("(.+)@(.+)$", email)){
+            return Response.status(404).entity("Need email to locate your profile").build();
+        }
+        if (name == null && roles.isEmpty()){
+            return Response.status(404).entity("Provide name--role to update the profile").build();
+        }
 
         User user = new User();
         user.setName(name);
@@ -58,62 +86,63 @@ public class UserResource{
             userDao = UserDao.getUserDao();
         }
 
-        userDao.updateUser(user);
-        return Response.ok().entity(user).build();
+        //check if the update was a success
+        if (userDao.updateUser(user) == 0){
+            return Response.ok().entity(user).entity("Update complete").build();
+        }
+        else
+        {
+            return Response.status(404).entity(user).entity("Email doesn't exist").build();
+        }
+
     }
 
     @GET
     @Path("delete/")
-    public Response deleteUser(@QueryParam("name") String name,
-                               @QueryParam("email") String email,
-                               @QueryParam("role") List<String> roles) {
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setRoles(roles);
-
+    public Response deleteUser(@QueryParam("email") String email) {
+        if (email == null){
+            return Response.status(404).entity("Need email to locate your profile").build();
+        }
         if (userDao == null) {
             userDao = UserDao.getUserDao();
         }
+        User user = userDao.deleteUser(email);
+        if (user != null){
+            return Response.ok().entity(user).build();
+        }
+        else
+            return Response.status(404).entity("Couldn't find the email").build();
 
-        userDao.deleteUser(email);
-        return Response.ok().entity(user).build();
     }
 
     @GET
     @Path("find/")
     public Response getUsers() {
-
-        ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {
-    		"classpath:/application-config.xml"
-    	});
-
     	userDao = context.getBean(UserDao.class);
-
     	ConcurrentHashMap<String, User> users = userDao.getUsers();
     	if (users == null) {
     		users = new ConcurrentHashMap<String, User>();
         }
-        try {
-            GenericEntity<ConcurrentHashMap<String, User>> usersEntity =
+        GenericEntity<ConcurrentHashMap<String, User>> usersEntity =
                     new GenericEntity<ConcurrentHashMap<String, User>>(users) {};
-            return Response.ok().entity(usersEntity).build();
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Something wrong").build();
+    	if (usersEntity.getEntity().isEmpty()){
+    	    return Response.ok().entity(usersEntity).entity("List is empty").build();
+    	}
+
+    	return Response.ok().entity(usersEntity).build();
     }
 
     @GET
     @Path("search/")
-    public Response findUser(@QueryParam("name") String name) {
-
+    public Response findUser(@QueryParam("email") String email) {
         if (userDao == null) {
             userDao = UserDao.getUserDao();
         }
-
-        User user = userDao.findUser(name);
-        return Response.ok().entity(user).build();
+        User user = userDao.findUser(email);
+        if (user != null){
+            return Response.ok().entity(user).build();
+        }
+        else
+            return Response.status(Response.Status.NOT_FOUND).entity("Could not find user").build();
     }
 }

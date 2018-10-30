@@ -2,6 +2,7 @@ package test.com.h2rd.refactoring.unit;
 
 import com.h2rd.refactoring.usermanagement.User;
 import com.h2rd.refactoring.usermanagement.UserDao;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -12,18 +13,26 @@ public class UserDaoUnitTest {
 
     @Test
     public void saveUserTest() {
+        System.out.println("INIT");
+
         userDao = UserDao.getUserDao();
+
 
         User user = new User();
         user.setName("Fake Name");
         user.setEmail("fake@email.com");
         user.setRoles(Arrays.asList("admin", "master"));
+        int res = userDao.saveUser(user);
 
-        userDao.saveUser(user);
+        System.out.println(userDao);
+
+        Assert.assertEquals(Integer.valueOf(0),Integer.valueOf(res));
     }
 
     @Test
     public void deleteUserTest() {
+        System.out.println("INIT");
+
         userDao = UserDao.getUserDao();
 
         User user = new User();
@@ -31,10 +40,7 @@ public class UserDaoUnitTest {
         user.setEmail("fake@email.com");
         user.setRoles(Arrays.asList("admin", "master"));
 
-        try {
-            userDao.deleteUser(user.getEmail());
-        } catch (NullPointerException e) {
-            //TODO
-        }
+        Assert.assertEquals(user.getEmail(), userDao.deleteUser(user.getEmail()).getEmail());
+
     }
 }

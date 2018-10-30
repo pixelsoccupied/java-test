@@ -6,22 +6,43 @@ public class UserDao {
 
     //Thread safe and O(1) time
     private static ConcurrentHashMap <String, User> users;
+
     private static UserDao userDao;
 
-    public static UserDao getUserDao() {
+    private static final Object mutex = new Object();
+
+    private UserDao() {
+
+    }
+
+    public synchronized static UserDao getUserDao() {
         if (userDao == null) {
-            userDao = new UserDao();
+                userDao = new UserDao();
 
         }
         return userDao;
     }
 
 
-    public void saveUser(User user) {
+    public int saveUser(User user) {
         if (users == null) {
             users = new ConcurrentHashMap<String, User>();
         }
-        users.put(user.getEmail(), user);
+        if (user.getRoles() == null || user.getRoles().isEmpty()){
+            return 1;
+        }
+        if (user.getEmail() == null){
+            return 2;
+        }
+        if (user.getName() == null){
+            return 3;
+        }
+        if (!users.containsKey(user.getEmail())) {
+            users.put(user.getEmail(), user);
+            return 0;
+
+        }
+        return 4;
     }
 
     public ConcurrentHashMap<String, User> getUsers() {
@@ -33,24 +54,29 @@ public class UserDao {
         }
     }
 
-    public int deleteUser(String email) {
+    public User deleteUser(String email) {
         if (users.containsKey(email)) {
-            users.remove(email);
-            return 0;
+            return users.remove(email);
         }
         else
-            return 1;
+            return null;
     }
 
     public int updateUser(User userToUpdate) {
+        //check if email exists
+        if (!users.containsKey(userToUpdate.getEmail())){
+            return -1;
+        }
         // no change in email
-        if (users.get(userToUpdate.getEmail()).getEmail().equals(userToUpdate.getEmail())) {
-            users.get(userToUpdate.getEmail()).setName(userToUpdate.getName());
-            users.get(userToUpdate.getEmail()).setRoles(userToUpdate.getRoles());
+        else {
+            if (userToUpdate.getName() != null && userToUpdate.getName().length()!= 0) {
+                users.get(userToUpdate.getEmail()).setName(userToUpdate.getName());
+            }
+            if (!userToUpdate.getRoles().isEmpty()) {
+                users.get(userToUpdate.getEmail()).setRoles(userToUpdate.getRoles());
+            }
             return 0;
         }
-        else
-            return 1;
     }
 
     public User findUser(String email) {
