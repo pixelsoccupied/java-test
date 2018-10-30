@@ -1,11 +1,11 @@
 package com.h2rd.refactoring.usermanagement;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserDao {
 
     //O(1) add/delete/search
-    private static HashMap<String, User> users;
+    private static ConcurrentHashMap<String, User> users;
 
     private static UserDao userDao;
 
@@ -22,9 +22,9 @@ public class UserDao {
     }
 
 
-    public synchronized int saveUser(User user) {
+    public int saveUser(User user) {
         if (users == null) {
-            users = new HashMap<String, User>();
+            users = new ConcurrentHashMap<String, User>();
         }
         if (user.getRoles() == null || user.getRoles().isEmpty()){
             return 1;
@@ -43,7 +43,7 @@ public class UserDao {
         return 4;
     }
 
-    public HashMap<String, User> getUsers() {
+    public ConcurrentHashMap<String, User> getUsers() {
         try {
             return users;
         } catch (Throwable e) {
@@ -60,7 +60,7 @@ public class UserDao {
             return null;
     }
 
-    public synchronized int updateUser(User userToUpdate) {
+    public int updateUser(User userToUpdate) {
         //check if email exists
         if (!users.containsKey(userToUpdate.getEmail())){
             return -1;

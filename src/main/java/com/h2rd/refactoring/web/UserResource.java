@@ -11,8 +11,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 
@@ -117,12 +117,12 @@ public class UserResource{
     @Path("find/")
     public Response getUsers() {
     	userDao = context.getBean(UserDao.class);
-    	HashMap<String, User> users = userDao.getUsers();
+        ConcurrentHashMap<String, User> users = userDao.getUsers();
     	if (users == null) {
-    		users = new HashMap<String, User>();
+    		users = new ConcurrentHashMap<String, User>();
         }
-        GenericEntity<HashMap<String, User>> usersEntity =
-                    new GenericEntity<HashMap<String, User>>(users) {};
+        GenericEntity<ConcurrentHashMap<String, User>> usersEntity =
+                    new GenericEntity<ConcurrentHashMap<String, User>>(users) {};
     	if (usersEntity.getEntity().isEmpty()){
     	    return Response.status(404).entity("List is empty").build();
     	}
